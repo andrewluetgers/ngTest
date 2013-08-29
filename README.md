@@ -3,6 +3,9 @@
 
 less boilerplatey more declarativy Karma + Jasmine tests for your angular.js code.
 
+## Use It
+just load ngTest.js in your karma tests and call the ngTest global function.
+
 ngTest does code generation of Angular specific Jasmine tests per the following spec.
 
 ## Defining tests
