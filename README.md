@@ -14,11 +14,13 @@ ngTest(spec, debug) takes an object that defines a series of Jasmine tests, and 
 To define the initial 'describe' function provide a string key for the description.
 The value can be a traditional describe function.
 
-	ngTest({
-		"This is my describe block": function() {
-			// just your standard describe function here
-		}
-	})
+```JavaScript
+ngTest({
+	"This is my describe block": function() {
+		// just your standard describe function here
+	}
+});
+```
 
 The value can also be an array of the following values all of which
 are optional and can be used multiple times:
