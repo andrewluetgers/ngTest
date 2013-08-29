@@ -11,8 +11,8 @@ ngTest does code generation of Angular specific Jasmine tests per the following 
 ## Defining tests
 ngTest(spec, debug) takes an object that defines a series of Jasmine tests, and an optional debug boolean.
 
-To define the initial 'describe' function provide a string key for the description
-the value can be a traditional describe function.
+To define the initial 'describe' function provide a string key for the description.
+The value can be a traditional describe function.
 
 	ngTest({
 		"This is my describe block": function() {
@@ -37,7 +37,7 @@ Use 'before' or 'after' as the prefix for the function name.
 This allows for multiple and self documenting
 beforeEach and afterEach functions if you want to have multiple.
 
-### Object:
+### Objects
 A nested 'describe' or 'it' function.
 The difference is determined by the convention of 'it' function keys starting with 'should'
 There are no changes to the 'it' function, provide your standard tests here.
