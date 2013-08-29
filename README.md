@@ -21,7 +21,7 @@ the value can be a traditional describe function.
 	})
 
 The value can also be an array of the following values all of which
-all optional and can be used multiple times:
+are optional and can be used multiple times:
 
 ### Strings
 Strings define either angular modules to load or dependencies to inject.
