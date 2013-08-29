@@ -39,7 +39,7 @@ A nested 'describe' or 'it' function.
 The difference is determined by the convention of 'it' function keys starting with 'should'
 There are no changes to the 'it' function, provide your standard tests here.
 
-
+## Example
 	ngTest({"Filters: common filters": ["myApp", "filters", {
 
 		"Filter: momentFormat": ["momentFormatFilter",{
