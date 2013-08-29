@@ -55,3 +55,40 @@ There are no changes to the 'it' function, provide your standard tests here.
 		}]
 
 	}]});
+
+If you provide the debug boolean in the above example it will log the generated code which looks like this:
+
+	describe("Filters: common filters", function() {
+
+		beforeEach(function() {
+			module('myApp');
+			module('filters');
+		});
+
+		describe("Filter: momentFormat", function() {
+
+			var momentFormatFilter;
+			beforeEach(inject(function(_momentFormatFilter_) {
+				momentFormatFilter = _momentFormatFilter_;
+			}));
+
+			it("should convert a date string to a formatted date string", function() {
+				expect(momentFormatFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toBe("08/27/13");
+			});
+
+		});
+
+		describe("Filter: momentAgo", function() {
+
+			var momentAgoFilter;
+			beforeEach(inject(function(_momentAgoFilter_) {
+				momentAgoFilter = _momentAgoFilter_;
+			}));
+
+			it("should convert a date string to an ago string", function() {
+				expect(momentAgoFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toEndWith(" ago");
+			});
+
+		});
+
+	});
