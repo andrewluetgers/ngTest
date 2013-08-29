@@ -40,7 +40,17 @@ var ngTest = (function(scope) {
 					if (_.isString(val)) {
 						// string = a module to load or dependencies to inject
 						// lets compile them into lists and in either case we need a before each function
-						isDependency(val) ? deps.push(val) : mods.push(val);
+						// supports modules that have the same name as a dependency
+						// e.g. titleService, we demarcate modules with a ':' suffix
+						// we can indicate the module and the dependency via the prefix "+" or ":+"
+						var name = val.replace(/\+$/, "");
+						name = name.replace(/:$/, "");
+						if (isModuleAndDep(val)) {
+							deps.push(name);
+							mods.push(name);
+						} else {
+							isModule(val) ? mods.push(name) : deps.push(name);
+						}
 
 					} else if (_.isFunction(val)) {
 						// function = beforeEach or afterEach
@@ -107,7 +117,7 @@ var ngTest = (function(scope) {
 
 				// add all the tests and nested describes
 				_.each(tests, function(testCode) {
-					code += 			testCode + "";
+					code += 			testCode;
 				});
 
 				// all done bitches
@@ -138,16 +148,12 @@ var ngTest = (function(scope) {
 		return !isTest(str);
 	}
 
-	function isDependency(str) {
-		var depSuffixes = [
-			"Controller",
-			"Filter",
-			"Service"
-		];
+	function isModule(str) {
+		return stringEndsWith(str, ":");
+	}
 
-		return _.any(depSuffixes, function(depSuffix) {
-			return stringEndsWith(str, depSuffix);
-		});
+	function isModuleAndDep(str) {
+		return stringEndsWith(str, "+");
 	}
 
 	function isBefore(fn) {
