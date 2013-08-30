@@ -1,5 +1,5 @@
 /*
- * ngTest.js 0.1.1 08-29-2013
+ * ngTest.js 0.1.2 08-29-2013
  * copyright (c) 2013 Andrew Luetgers
  * you are free to distribute ngTest.js under the MIT license
  * https://github.com/andrewluetgers/ngTest
@@ -32,6 +32,7 @@ var ngTest = (function(scope) {
 				var deps = [],
 					mods = [],
 					before = [],
+					funcs = [],
 					after = [],
 					tests = [];
 
@@ -54,9 +55,19 @@ var ngTest = (function(scope) {
 
 					} else if (_.isFunction(val)) {
 						// function = beforeEach or afterEach
-						if (isBefore(val) || (!before.length && !isAfter(val))) {
+						if (isNamed(val)) {
+							if (isBefore(val)) {
 							before.push(val);
-						} else if (isAfter(val) || (!after.length && !isBefore(val))) {
+							} else if (isAfter(val)) {
+							after.push(val);
+							} else {
+								// named functions not prefixed
+								// with before or after get in-lined
+								funcs.push(val);
+							}
+						} else if (!before.length) {
+							before.push(val);
+						} else if (!after.length) {
 							after.push(val);
 						}
 
@@ -69,6 +80,9 @@ var ngTest = (function(scope) {
 				debug && console.log(mods, deps, before, after, tests);
 
 				// code gen phase --------------
+
+				// in-line our named functions that are not prefixed with before or after
+				funcs.length && (code += "\n\n" + funcs.join("\n\n"));
 
 				// load modules
 				// will generating for something like this
@@ -162,6 +176,10 @@ var ngTest = (function(scope) {
 
 	function isAfter(fn) {
 		return stringStartsWith(fn + "", "function after");
+	}
+
+	function isNamed(fn) {
+		return stringStartsWith(fn + "", "function ");
 	}
 
 	function stringStartsWith(haystack, needle) {

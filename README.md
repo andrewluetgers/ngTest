@@ -31,77 +31,15 @@ The difference is determined by the convention of appending ":" to module names 
 Also remember to use the fully qualified angular name for dependencies
 e.g. 'momentFormatFilter' instead of just 'momentFormat'
 
-### Anonymous Functions
-The first will become a beforeEach,
-the second will become an afterEach. If you need more than that or want something more self-documenting see Named Functions below.
-
-### Named Functions
-Use 'before' or 'after' as the prefix for the function name.
-This allows for multiple and self documenting
-beforeEach and afterEach functions if you want to have multiple.
-
-### Objects
-A nested 'describe' or 'it' function.
-The difference is determined by the convention of 'it' function keys starting with 'should'
-There are no changes to the 'it' function, provide your standard tests here.
-
-## Example
-```JavaScript
-ngTest({"Filters: common filters": ["myApp:", "filters:", {
-
-	"Filter: momentFormat": ["momentFormatFilter",{
-		"should convert a date string to a formatted date string": function() {
-			expect(momentFormatFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toBe("08/27/13");
-		}
-	}],
-
-	"Filter: momentAgo": ["momentAgoFilter", {
-		"should convert a date string to an ago string": function() {
-			expect(momentAgoFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toEndWith(" ago");
-		}
-	}]
-
-}]});
-```
-
-If you provide the debug boolean in the above example it will log the generated code which looks like this:
 
 ```JavaScript
-describe("Filters: common filters", function() {
-
-	beforeEach(function() {
-		module('myApp');
-		module('filters');
-	});
-
-	describe("Filter: momentFormat", function() {
-
-		var momentFormatFilter;
-		beforeEach(inject(function(_momentFormatFilter_) {
-			momentFormatFilter = _momentFormatFilter_;
-		}));
-
-		it("should convert a date string to a formatted date string", function() {
-			expect(momentFormatFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toBe("08/27/13");
-		});
-
-	});
-
-	describe("Filter: momentAgo", function() {
-
-		var momentAgoFilter;
-		beforeEach(inject(function(_momentAgoFilter_) {
-			momentAgoFilter = _momentAgoFilter_;
-		}));
-
-		it("should convert a date string to an ago string", function() {
-			expect(momentAgoFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toEndWith(" ago");
-		});
-
-	});
-
+ngTest({"Testing my Module": ["myModule:", "myDependency", {
+	"should work": function() {
+		// put expect code here
+	}}]
 });
 ```
+
 
 Here's an example showing how modules that have the same name as a dependency can be handled with the '+' suffix.
 In this case the 'titleService:+' will cause the titleService module to be loaded and will inject the titleService dependency.
@@ -171,6 +109,127 @@ describe('titleService', function () {
 		titleService.setTitle(title);
 
 		return expect(titleService.getTitle()).toEqual(title + suffix);
+	});
+
+});
+```
+
+
+### Anonymous Functions
+The first will become a beforeEach,
+the second will become an afterEach. If you need more than that or want something more self-documenting see Named Functions below.
+
+```JavaScript
+ngTest({"Testing my Module": ["myModule:", "myDependency",
+	function() {
+		// do before each
+	},
+	function() {
+		// do after each
+	}, {
+		"should work": function() {
+			// put expect code here
+		}
+	}]
+});
+```
+
+
+
+### Named Functions
+Use 'before' or 'after' as the prefix for the function name.
+This allows for multiple and self documenting
+beforeEach and afterEach functions if you want to have multiple.
+
+```JavaScript
+ngTest({"Testing my Module": ["myModule:", "myDependency",
+	function before() {
+		// do before each
+	},
+	function beforeTwo() {
+		// do before each
+	},
+	function after() {
+		// do after each
+	}, {
+		"should work": function() {
+			// put expect code here
+		}
+	}]
+});
+```
+
+Named functions that are not prefixed with 'before' or 'after' get in-lined into the describe block and will be ready for use in your tests.
+
+```JavaScript
+ngTest({"Testing my Module": ["myModule:", "myDependency",
+	function times2(n) {
+		return n*2;
+	}, {
+		"should work": function() {
+			expect(times2(5)).toBe(10);
+		}
+	}]
+});
+```
+
+### Objects
+A nested 'describe' or 'it' function.
+The difference is determined by the convention of 'it' function keys starting with 'should'
+There are no changes to the 'it' function, provide your standard tests here.
+
+```JavaScript
+ngTest({"Filters: common filters": ["myApp:", "filters:", {
+
+	"Filter: momentFormat": ["momentFormatFilter",{
+		"should convert a date string to a formatted date string": function() {
+			expect(momentFormatFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toBe("08/27/13");
+		}
+	}],
+
+	"Filter: momentAgo": ["momentAgoFilter", {
+		"should convert a date string to an ago string": function() {
+			expect(momentAgoFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toEndWith(" ago");
+		}
+	}]
+
+}]});
+```
+
+If you provide the debug boolean in the above example it will log the generated code which looks like this:
+
+```JavaScript
+describe("Filters: common filters", function() {
+
+	beforeEach(function() {
+		module('myApp');
+		module('filters');
+	});
+
+	describe("Filter: momentFormat", function() {
+
+		var momentFormatFilter;
+		beforeEach(inject(function(_momentFormatFilter_) {
+			momentFormatFilter = _momentFormatFilter_;
+		}));
+
+		it("should convert a date string to a formatted date string", function() {
+			expect(momentFormatFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toBe("08/27/13");
+		});
+
+	});
+
+	describe("Filter: momentAgo", function() {
+
+		var momentAgoFilter;
+		beforeEach(inject(function(_momentAgoFilter_) {
+			momentAgoFilter = _momentAgoFilter_;
+		}));
+
+		it("should convert a date string to an ago string", function() {
+			expect(momentAgoFilter("Tue Aug 27 2013 14:04:12 GMT-0500 (CDT)", "MM/DD/YY")).toEndWith(" ago");
+		});
+
 	});
 
 });
