@@ -34,7 +34,8 @@ var ngTest = (function(scope) {
 					before = [],
 					funcs = [],
 					after = [],
-					tests = [];
+					tests = [],
+					compile = false;
 
 				// compile phase --------------
 				_.each(spec, function(val) {
@@ -54,12 +55,16 @@ var ngTest = (function(scope) {
 						}
 
 					} else if (_.isFunction(val)) {
-						// function = beforeEach or afterEach
+						// function = beforeEach, afterEach or some inline function
+
+						// are we needing the compileDirective util?
+						compile = (!compile && (val+"").match("compileWithScope")) ? true : compile;
+
 						if (isNamed(val)) {
 							if (isBefore(val)) {
-							before.push(val);
+								before.push(val);
 							} else if (isAfter(val)) {
-							after.push(val);
+								after.push(val);
 							} else {
 								// named functions not prefixed
 								// with before or after get in-lined
@@ -79,12 +84,12 @@ var ngTest = (function(scope) {
 
 				debug && console.log(mods, deps, before, after, tests);
 
-				// code gen phase --------------
+				// code gen phase --------------------------------------------------------------------
 
 				// in-line our named functions that are not prefixed with before or after
-				funcs.length && (code += "\n\n" + funcs.join("\n\n"));
+				funcs.length && (code += " " + funcs.join(" "));
 
-				// load modules
+				// load modules ------------------
 				// will generating for something like this
 				//	beforeEach(function() {
 				//		module('clario');
@@ -100,7 +105,23 @@ var ngTest = (function(scope) {
 				}
 
 
-				// inject deps via closure ref
+				// add in the compileWithScope util deps if needed ------------------
+
+				// we use compile in the nested code?
+				compile = compile || _.any(tests, function(code) {
+					return !!(code).match("compileWithScope");
+				});
+
+				if (compile) {
+					// if we need the compileWithScope util lets load up a couple deps for it
+					deps.push("$compile", "$rootScope");
+					deps = _.uniq(deps);
+				}
+
+				// compileWithScope util function added after deps
+
+
+				// inject deps via closure ref ------------------
 				// will generate something like this
 				// 		var momentAgoFilter;
 				//		beforeEach(inject(function(_momentAgoFilter_) {
@@ -120,7 +141,38 @@ var ngTest = (function(scope) {
 					code += 			depCode + "}));";  // end inject code
 				}
 
-				// add our befores and afters
+				// add in the compileWithScope util if needed ------------------
+				function compileWithScope(spec) {
+
+					var ret = {};
+
+					// create a scope
+					ret.scope = $rootScope.$new();
+
+					// copy provided scope vals to our new scope
+					if (spec.scope) {
+						angular.extend(ret.scope, spec.scope);
+					}
+
+					// get the jqLite or jQuery element
+					ret.el = angular.element(spec.html);
+
+					// compile the element into a function to
+					// process the view.
+					ret.compiled = $compile(ret.el);
+
+					// run the compiled view.
+					ret.compiled(ret.scope);
+
+					// call digest on the scope!
+					ret.scope.$digest();
+
+					return ret;
+				}
+
+				code += compile ? compileWithScope : "/* compileWithScope util not required */";
+
+				// add our befores and afters ------------------
 				_.each(before, function(fn) {
 					code += 			"beforeEach(" + fn + ");";
 				});
@@ -129,12 +181,13 @@ var ngTest = (function(scope) {
 					code += 			"afterEach(" + fn + ");";
 				});
 
-				// add all the tests and nested describes
+
+				// add all the tests and nested describes ------------------
 				_.each(tests, function(testCode) {
 					code += 			testCode;
 				});
 
-				// all done bitches
+				// all done bitches ------------------
 				code += 				"});"; // end describe fn
 
 			} else {

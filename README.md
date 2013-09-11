@@ -234,3 +234,104 @@ describe("Filters: common filters", function() {
 
 });
 ```
+
+
+### compileWithScope util
+ngTest also provides a handy util for testing directives that to help
+reduce the boilerplate for compiling a directive with a new scope.
+
+Simply call the compileWithScope(spec) function where spec is an object with an 'html' string property
+and a 'scope' property that is a plain old js object containing the values you would like on your scope.
+If no scope object is provided the html will be compiled with a new scope that is empty.
+
+Usage looks like this
+```JavaScript
+ngTest({"SimplePicker - Element directive for a basic skinnable widget": [
+	"simplePicker:",
+	"templates-common:",
+	"filters:",
+	{
+		"Should create a picker widget": function() {
+			var directive = compileWithScope({
+				html: '<simple-picker id="myPicker" items="clients" selected-id="selectedId"/>',
+				scope: {
+					clients: [
+						{id: 0, name: "test"},
+						{id: 1, name: "test1"},
+						{id: 2, name: "test2"}
+					],
+					selectedId: 1
+				}
+			});
+			dump(directive.el, 5);
+
+
+		}
+	}
+]});
+```
+
+Which will output the following code.
+
+```JavaScript
+describe('SimplePicker - Element directive for a basic skinnable widget', function () {
+
+	beforeEach(function () {
+		module('simplePicker');
+		module('templates-common');
+		module('filters');
+	});
+
+	var $compile, $rootScope;
+	beforeEach(inject(function (_$compile_, _$rootScope_) {
+		$compile = _$compile_;
+		$rootScope = _$rootScope_;
+	}));
+
+	function compileWithScope(spec) {
+
+		var ret = {};
+
+		// create a scope
+		ret.scope = $rootScope.$new();
+
+		// copy provided scope vals to our new scope
+		if (spec.scope) {
+			angular.extend(ret.scope, spec.scope);
+		}
+
+		// get the jqLite or jQuery element
+		ret.el = angular.element(spec.html);
+
+		// compile the element into a function to
+		// process the view.
+		ret.compiled = $compile(ret.el);
+
+		// run the compiled view.
+		ret.compiled(ret.scope);
+
+		// call digest on the scope!
+		ret.scope.$digest();
+
+		return ret;
+	}
+
+	it('Should create a picker widget', function () {
+		var directive = compileWithScope({
+			html: '<simple-picker id="myPicker" items="clients" selected-id="selectedId"/>',
+			scope: {
+				clients: [
+					{id: 0, name: "test"},
+					{id: 1, name: "test1"},
+					{id: 2, name: "test2"}
+				],
+				selectedId: 1
+			}
+		});
+		dump(directive.el, 5);
+
+
+	});
+});
+```
+
