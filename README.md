@@ -237,7 +237,7 @@ describe("Filters: common filters", function() {
 
 
 ### compileWithScope util
-ngTest also provides a handy util for testing directives that to help
+ngTest also provides a handy util for testing directives to help
 reduce the boilerplate for compiling a directive with a new scope.
 
 Simply call the compileWithScope(spec) function where spec is an object with an 'html' string property
@@ -263,9 +263,13 @@ ngTest({"SimplePicker - Element directive for a basic skinnable widget": [
 					selectedId: 1
 				}
 			});
-			dump(directive.el, 5);
 
+			// compileWithScope returns an object with the following members
+			dump(directive.el, directive.scope, directive.compiled);
 
+			expect($(directive.el).attr("id")).toBe("myPicker");
+			expect($("a.pickerSelection", directive.el).text()).toBe("test1");
+			expect($("ul li", directive.el).length).toBe(3);
 		}
 	}
 ]});
@@ -328,9 +332,13 @@ describe('SimplePicker - Element directive for a basic skinnable widget', functi
 				selectedId: 1
 			}
 		});
-		dump(directive.el, 5);
 
+		// compileWithScope returns an object with the following members
+		dump(directive.el, directive.scope, directive.compiled);
 
+		expect($(directive.el).attr("id")).toBe("myPicker");
+		expect($("a.pickerSelection", directive.el).text()).toBe("test1");
+		expect($("ul li", directive.el).length).toBe(3);
 	});
 });
 ```
