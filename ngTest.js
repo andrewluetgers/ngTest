@@ -5,11 +5,16 @@
  * https://github.com/andrewluetgers/ngTest
  */
 
-var ngTest = (function(scope) {
+var ngTest = (function(root) {
 
 	function ngTest(obj, depth, debug) {
 
 		var code = "";
+		function list() {
+			return Array.prototype.slice.call(arguments, 0);
+		}
+
+		var log = ("dump" in root) ? dump : function() {console.log.apply(console, list(arguments));}
 		debug = debug || depth === true;
 		depth = _.isNumber(depth) ? ++depth : 0;
 
@@ -29,7 +34,8 @@ var ngTest = (function(scope) {
 
 				// we have an array of possible actions depending on type
 				// so lets compile lists of each then code-gen
-				var deps = [],
+				var vars = [],
+					deps = [],
 					mods = [],
 					before = [],
 					funcs = [],
@@ -47,9 +53,12 @@ var ngTest = (function(scope) {
 						// we can indicate the module and the dependency via the prefix "+" or ":+"
 						var name = val.replace(/\+$/, "");
 						name = name.replace(/:$/, "");
+
 						if (isModuleAndDep(val)) {
 							deps.push(name);
 							mods.push(name);
+						} else if (isVariable(val)) {
+							vars.push(val.replace(/=$/, ""));
 						} else {
 							isModule(val) ? mods.push(name) : deps.push(name);
 						}
@@ -82,24 +91,36 @@ var ngTest = (function(scope) {
 					}
 				});
 
-				debug && console.log(mods, deps, before, after, tests);
+				debug && log(mods, deps, before, after, tests);
 
 				// code gen phase --------------------------------------------------------------------
 
 				// in-line our named functions that are not prefixed with before or after
-				funcs.length && (code += " " + funcs.join(" "));
+				funcs.length && (code += "\n\n" + funcs.join("\n\n"));
 
 				// load modules ------------------
 				// will generating for something like this
 				//	beforeEach(function() {
-				//		module('clario');
+				//		module('foo');
+				//		module('bar');
 				//		module('filters');
 				//	});
+
+				// if ngExampleApp is loading the test include the ngExampleApp module
+				if ("ngExampleApp" in root) {
+					mods.unshift("ngExampleApp");
+				}
+
 				var modCode = "";
 				if (mods.length) {
 					modCode = 			"beforeEach(function() {";
 					_.each(mods, function(mod) {
+						// if running under the ngExampleApp loader skip things that look like templates
+						if("ngExampleApp" in root && isTemplate(mod)) {
+							modCode += 		" /*\"module('"+mod+"');\" eliminated for compatibility with ngExampleApp loader */";
+						} else {
 						modCode += 		"module('"+mod+"');";
+						}
 					});
 					code += 			modCode + "});";
 				}
@@ -119,6 +140,12 @@ var ngTest = (function(scope) {
 				}
 
 				// compileWithScope util function added after deps
+
+
+				// add in our vars ------------------
+				if (vars.length) {
+					code += 			"var "+ vars +";";
+				}
 
 
 				// inject deps via closure ref ------------------
@@ -170,7 +197,33 @@ var ngTest = (function(scope) {
 					return ret;
 				}
 
-				code += compile ? compileWithScope : "/* compileWithScope util not required */";
+				code += compile ? " " +compileWithScope : "/* compileWithScope util not required */";
+
+				// add our ngExampleApp support
+				function beforeInjections_() {
+					_.each(testInjections.before, function(fn) {
+						if (_.isFunction(fn)) {
+							inject(fn);
+						}
+					});
+				}
+
+				function afterInjections_() {
+					_.each(testInjections.after, function(fn) {
+						if (_.isFunction(fn)) {
+							inject(fn);
+						}
+					});
+				}
+
+				if ("ngExampleApp" in root) {
+					if (testInjections.before.length) {
+						before.unshift(beforeInjections_);
+					}
+					if (testInjections.after.length) {
+						after.unshift(afterInjections_);
+					}
+				}
 
 				// add our befores and afters ------------------
 				_.each(before, function(fn) {
@@ -191,18 +244,18 @@ var ngTest = (function(scope) {
 				code += 				"});"; // end describe fn
 
 			} else {
-				console.log("Bad spec!", spec);
+				log("Bad spec!", spec);
 				throw new TypeError("expected array or function but saw " + typeof spec);
 			}
 
 		});
 
 		if (depth === 0) {
-			debug && console.log("final code", code, depth);
+			debug && log("final code", code, depth);
 			var fn = new Function(code);
-			fn.call(scope);
+			fn.call(root);
 		} else {
-			debug && console.log("returning code", code, depth);
+			debug && log("returning code", code, depth);
 			return code;
 		}
 	}
@@ -221,6 +274,14 @@ var ngTest = (function(scope) {
 
 	function isModuleAndDep(str) {
 		return stringEndsWith(str, "+");
+	}
+
+	function isVariable(str) {
+		return stringEndsWith(str, "=");
+	}
+
+	function isTemplate(str) {
+		return str.match(/template|\.tpl\.html/i);
 	}
 
 	function isBefore(fn) {
