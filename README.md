@@ -114,6 +114,50 @@ describe('titleService', function () {
 });
 ```
 
+### Closure Variables
+You may want to define a value once and have it available to all your tests through a closure reference. This is no problem.
+Simply inline the name of the variable you want appended with = like so:
+```JavaScript
+ngTest({"Example Test": [
+	"mySharedData=",
+	function before() {
+		mySharedData = {
+			items: [
+				{id: 0, name: "test"},
+				{id: 1, name: "test1"},
+				{id: 2, name: "test2"}
+			],
+			selectedId: 1
+		};
+	},
+	{
+		"Should have access to mySharedData": function() {
+			expect(mySharedData.items.length).toBe(3);
+		}
+	}
+]});
+```
+
+output looks like this
+
+```JavaScript
+describe('Example Test', function () {
+	var mySharedData;
+	beforeEach(function before() {
+		mySharedData = {
+			items: [
+				{id: 0, name: "test"},
+				{id: 1, name: "test1"},
+				{id: 2, name: "test2"}
+			],
+			selectedId: 1
+		};
+	});
+	it('Should have access to mySharedData', function () {
+		expect(mySharedData.items.length).toBe(3);
+	});
+});
+```
 
 ### Anonymous Functions
 The first will become a beforeEach,
@@ -172,6 +216,8 @@ ngTest({"Testing my Module": ["myModule:", "myDependency",
 	}]
 });
 ```
+
+
 
 ### Objects
 A nested 'describe' or 'it' function.
@@ -342,4 +388,6 @@ describe('SimplePicker - Element directive for a basic skinnable widget', functi
 	});
 });
 ```
-
+### Support for ngExample
+[ngExample](https://github.com/andrewluetgers/ngExample) specifically uses ngTest to help with some test rewriting it needs to do, functionality to support this are baked into ngTest.
+Specifically this includes blocking the loading of modules where the module name matches the following regex /template|\.tpl\.html/i
