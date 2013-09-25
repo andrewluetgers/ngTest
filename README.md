@@ -389,5 +389,8 @@ describe('SimplePicker - Element directive for a basic skinnable widget', functi
 });
 ```
 ### Support for ngExample
-[ngExample](https://github.com/andrewluetgers/ngExample) specifically uses ngTest to help with some test rewriting it needs to do, functionality to support this are baked into ngTest.
-Specifically this includes blocking the loading of modules where the module name matches the following regex /template|\.tpl\.html/i
+[ngExample](https://github.com/andrewluetgers/ngExample) uses ngTest to help with some test rewriting it needs to do, functionality to support this is baked into ngTest.
+Specifically this includes:
+* automatic injection of the ngExampleApp module as needed
+* blocking the loading of modules where the module name matches the following regex /template|\.tpl\.html/i
+* Support for deferred injection of test before and after functions the testInjections global. Anyone can use this feature by defining either or both the before and after members of this object as arrays of before each and after each functions that will be added to the top of the first describe block.

@@ -199,7 +199,7 @@ var ngTest = (function(root) {
 
 				code += compile ? " " +compileWithScope : "/* compileWithScope util not required */";
 
-				// add our ngExampleApp support
+				// add our deferred injection support
 				function beforeInjections_() {
 					_.each(testInjections.before, function(fn) {
 						if (_.isFunction(fn)) {
@@ -216,11 +216,11 @@ var ngTest = (function(root) {
 					});
 				}
 
-				if ("ngExampleApp" in root) {
-					if (testInjections.before.length) {
+				if ("testInjections" in root) {
+					if (_.isArray(testInjections.before) && testInjections.before.length) {
 						before.unshift(beforeInjections_);
 					}
-					if (testInjections.after.length) {
+					if (_.isArray(testInjections.after) && testInjections.after.length) {
 						after.unshift(afterInjections_);
 					}
 				}
