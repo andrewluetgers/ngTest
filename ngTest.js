@@ -1,5 +1,5 @@
 /*
- * ngTest.js 0.1.2 08-29-2013
+ * ngTest.js 0.1.3 08-29-2013
  * copyright (c) 2013 Andrew Luetgers
  * you are free to distribute ngTest.js under the MIT license
  * https://github.com/andrewluetgers/ngTest
