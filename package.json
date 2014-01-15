@@ -1,0 +1,25 @@
+{
+	"fullName": "ngTest",
+	"name": "ngTest",
+	"version": "0.2.0",
+	"main": "ngTest.js",
+	"author": "Andrew Luetgers",
+	"description": "Less boilerplatey more declarativy Karma + Jasmine tests for your ng-di or angular.js code",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/andrewluetgers/ngTest.git"
+	},
+	"keywords": [
+		"jasmine",
+		"ngTest",
+		"test",
+		"angular",
+		"ng-di"
+	],
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/andrewluetgers/ngTest/issues"
+	},
+	"readmeFilename": "README.md"
+
+}

@@ -394,3 +394,8 @@ Specifically this includes:
 * automatic injection of the ngExampleApp module as needed
 * blocking the loading of modules where the module name matches the following regex /template|\.tpl\.html/i
 * Support for deferred injection of test before and after functions the testInjections global. Anyone can use this feature by defining either or both the before and after members of this object as arrays of before each and after each functions that will be added to the top of the first describe block.
+
+### Support for React.js
+basically this means adding the following handy global variable to the page if ReactTestUtils are loaded.
+
+	ReactTestUtils = React.addons.ReactTestUtils;

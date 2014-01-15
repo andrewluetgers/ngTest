@@ -1,9 +1,16 @@
 /*
- * ngTest.js 0.1.3 08-29-2013
+ * ngTest.js 0.2.0 01-14-2014
  * copyright (c) 2013 Andrew Luetgers
  * you are free to distribute ngTest.js under the MIT license
  * https://github.com/andrewluetgers/ngTest
  */
+
+/*
+todo support test isolation ! and exclusion #
+todo support mocking with provide boilerplate removal using a provide function
+that maps to the angular provide function
+see 27:00 of http://www.youtube.com/watch?v=AKwqfHm-3ZQ#t=1630
+*/
 
 var ngTest = (function(root) {
 
@@ -105,6 +112,12 @@ var ngTest = (function(root) {
 				//		module('bar');
 				//		module('filters');
 				//	});
+
+				// if we have ReactTestUtils add a nice short reference to them
+				if (React && React.addons && React.addons.ReactTestUtils) {
+					code += "ReactTestUtils = React.addons.ReactTestUtils;";
+				}
+
 
 				// if ngExampleApp is loading the test include the ngExampleApp module
 				if ("ngExampleApp" in root) {
@@ -261,11 +274,20 @@ var ngTest = (function(root) {
 	}
 
 	function isTest(str) {
-		return stringStartsWith(str.toLowerCase(), "should");
+		var str = str.toLowerCase();
+		return (stringStartsWith(str, "should") || stringStartsWith(str, "!should") || stringStartsWith(str, "#should"));
 	}
 
 	function isDescribe(str) {
 		return !isTest(str);
+	}
+
+	function isExcluded(str) {
+		return stringStartsWith(str, "#");
+	}
+
+	function isIsolated(str) {
+		return stringStartsWith(str, "!");
 	}
 
 	function isModule(str) {
