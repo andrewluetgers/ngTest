@@ -6,7 +6,7 @@ less boilerplatey more declarativy Karma + Jasmine tests for your [ng-di](https:
 ## Use It
 just load ngTest.js in your karma tests and call the ngTest global function.
 
-ngTest does code generation of Angular specific Jasmine tests per the following spec.
+ngTest does code generation of ng-di and Angular specific Jasmine tests per the following spec.
 
 ## Defining tests
 ngTest(spec, debug) takes an object that defines a series of Jasmine tests, and an optional debug boolean.
