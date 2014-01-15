@@ -1,6 +1,6 @@
 {
-	"fullName": "ngTest",
-	"name": "ngTest",
+	"fullName": "ng-test",
+	"name": "ng-test",
 	"version": "0.2.0",
 	"main": "ngTest.js",
 	"author": "Andrew Luetgers",
@@ -12,6 +12,7 @@
 	"keywords": [
 		"jasmine",
 		"ngTest",
+		"ng-test",
 		"test",
 		"angular",
 		"ng-di"
@@ -21,5 +22,4 @@
 		"url": "https://github.com/andrewluetgers/ngTest/issues"
 	},
 	"readmeFilename": "README.md"
-
 }
