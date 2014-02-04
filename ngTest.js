@@ -1,5 +1,5 @@
 /*
- * ngTest.js 0.2.0 01-14-2014
+ * ngTest.js 0.2.0 02-03-2014
  * copyright (c) 2013 Andrew Luetgers
  * you are free to distribute ngTest.js under the MIT license
  * https://github.com/andrewluetgers/ngTest
@@ -114,7 +114,7 @@ var ngTest = (function(root) {
 				//	});
 
 				// if we have ReactTestUtils add a nice short reference to them
-				if (React && React.addons && React.addons.ReactTestUtils) {
+				if (("React" in root) && React.addons && React.addons.ReactTestUtils) {
 					code += "ReactTestUtils = React.addons.ReactTestUtils;";
 				}
 

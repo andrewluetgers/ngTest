@@ -1,7 +1,7 @@
 {
 	"fullName": "ng-test",
 	"name": "ng-test",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"main": "ngTest.js",
 	"author": "Andrew Luetgers",
 	"description": "Less boilerplatey more declarativy Karma + Jasmine tests for your ng-di or angular.js code",
